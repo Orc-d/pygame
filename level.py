@@ -2,6 +2,7 @@ import pygame
 from settings import *
 from tile import Tile
 from player import Player
+from debug import debug
 
 class Level:
     def __init__(self):
@@ -21,7 +22,10 @@ class Level:
                 if col == 'x':
                     Tile((x,y),[self.visible_sprite,self.obstacles_sprite])
                 if col == 'p':
-                    Player((x,y),[self.visible_sprite])
+                    #추후에 사용하기 위해 객체르 만듦
+                    self.player = Player((x,y),[self.visible_sprite])
     
     def run(self):
         self.visible_sprite.draw(self.display_surface)
+        self.visible_sprite.update()
+        debug(self.player.direction.magnitude())

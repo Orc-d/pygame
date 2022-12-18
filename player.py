@@ -2,7 +2,8 @@ import pygame
 from settings import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self,pos,groups):
+    #장애물 위치를 알기위해 ob.. 을 arg 로 받음
+    def __init__(self,pos,groups,obstacle_sprites):
         super().__init__(groups)
         self.image = pygame.image.load('graphics\\test\\player.png')
         self.rect = self.image.get_rect(topleft = pos)
@@ -10,6 +11,9 @@ class Player(pygame.sprite.Sprite):
         #플레이어 방향을 위한 vector 값 변수
         self.direction = pygame.math.Vector2()
         self.speed = 5
+        
+        #장애물 sprite 객체 ( 충돌 처리용 )
+        self.obstacle_sprites = obstacle_sprites
         
     def input(self):
         #메인에서 포문 안으로 들어감으로 반복처리 안해도 됨
@@ -36,7 +40,32 @@ class Player(pygame.sprite.Sprite):
         if self.direction.magnitude() != 0:
             #vector 값 노멀라이즈
             self.direction = self.direction.normalize()
-        self.rect.center += self.direction * speed
+        #충돌 처리를 위해 x, y 이동 을 각각 분리
+        self.rect.x += self.direction.x * speed
+        self.collision('horizontal')
+        self.rect.y += self.direction.y * speed
+        self.collision('vertical')
+        # self.rect.center += self.direction * speed
+        
+    def collision (self,direction):
+        if direction == 'horizontal':
+            #스프라이트 (묶음) 안에있는걸 하나씩 꺼내옴
+            for sprite in self.obstacle_sprites:
+                #스프라이트 (낱개) 안에있는 rect 의 colliderect 메서드 사용
+                if sprite.rect.colliderect(self.rect):
+                    if self.direction.x > 0 : #오른쪽으로 이동주일때
+                        self.rect.right = sprite.rect.left # 스프라이트 (낱개) 의 왼쪽 값으로
+                    if self.direction.x < 0 : #왼쪽으로
+                        self.rect.left = sprite.rect.right
+                              
+        if direction == 'vertical':
+            for sprite in self.obstacle_sprites:
+                if sprite.rect.colliderect(self.rect):
+                    if self.direction.y < 0 : 
+                        self.rect.top = sprite.rect.bottom
+                    if self.direction.y > 0 : 
+                        self.rect.bottom = sprite.rect.top
+                    
         
     def update(self):
         self.input()

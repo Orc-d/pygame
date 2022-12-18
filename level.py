@@ -23,9 +23,9 @@ class Level:
                     Tile((x,y),[self.visible_sprite,self.obstacles_sprite])
                 if col == 'p':
                     #추후에 사용하기 위해 객체르 만듦
-                    self.player = Player((x,y),[self.visible_sprite])
+                    self.player = Player((x,y),[self.visible_sprite],self.obstacles_sprite)
     
     def run(self):
         self.visible_sprite.draw(self.display_surface)
         self.visible_sprite.update()
-        debug(self.player.direction.magnitude())
+        debug(self.player.direction)

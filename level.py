@@ -29,6 +29,7 @@ class Level:
     
     def run(self):
         self.visible_sprite.custom_draw(self.player)
+        #플레이어 offset 값을 얻기 위해 player 객체를 받음
         self.visible_sprite.update()
         debug(self.player.direction)
  
@@ -48,7 +49,8 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.offset.y = player.rect.centery - self.half_height
         #offset 값을 줘서 플레이어를 가운데로
         
-        for sprite in self.sprites():
+        # for sprite in self.sprites():
+        for sprite in sorted(self.sprites(),key = lambda sprite: sprite.rect.centery):
             #화면의 blit 메서드를 사용하여 Draw 처리 
             offset_pos = sprite.rect.topleft - self.offset
             self.display_surface.blit(sprite.image,offset_pos)

@@ -25,8 +25,8 @@ class Level:
             'object' : import_csv_layout('map\\map_Objects.csv')
         }
         graphics = {
-            'grass' : import_forder('graphics\\grass'),
-            'objects' : import_forder('graphics\\objects')
+            'grass' : import_folder('graphics\\grass'),
+            'objects' : import_folder('graphics\\objects')
         }
         
         for style, layout in layouts.items():
@@ -58,7 +58,7 @@ class Level:
         self.visible_sprite.custom_draw(self.player)
         #플레이어 offset 값을 얻기 위해 player 객체를 받음
         self.visible_sprite.update()
-        debug(self.player.direction)
+        debug(self.player.status)
  
 #카메라 설정을 위해 Group 값을 상속 받고 커스텀        
 class YSortCameraGroup(pygame.sprite.Group):

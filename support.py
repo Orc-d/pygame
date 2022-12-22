@@ -14,7 +14,7 @@ def import_csv_layout(path):
             terrain_map.append(list(row))
         return terrain_map
 
-def import_forder(path):
+def import_folder(path):
     surface_list = []
     
     #폴더 주소를 받아서 안에 이미지를 다 넣음

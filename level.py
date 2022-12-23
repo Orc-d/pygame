@@ -5,6 +5,7 @@ from player import Player
 from debug import debug
 from support import *
 from random import randint
+from weapon import Weapon
 
 class Level:
     def __init__(self):
@@ -51,14 +52,17 @@ class Level:
         #             #추후에 사용하기 위해 객체르 만듦
         #             self.player = Player((x,y),[self.visible_sprite],self.obstacles_sprite)
     
-        self.player = Player((2000,1430),[self.visible_sprite],self.obstacles_sprite)
+        #플레이어 공격 처리를 위해 create_attack 객체를 넘겨줌 play 내부에서 실행되게 하기 위해 () 없이 넘겨주기만함
+        self.player = Player((2000,1430),[self.visible_sprite],self.obstacles_sprite,self.create_attack)
     
+    def create_attack(self):
+        Weapon(self.player,[self.visible_sprite])
     
     def run(self):
         self.visible_sprite.custom_draw(self.player)
         #플레이어 offset 값을 얻기 위해 player 객체를 받음
         self.visible_sprite.update()
-        debug(self.player.status)
+        debug(self.visible_sprite)
  
 #카메라 설정을 위해 Group 값을 상속 받고 커스텀        
 class YSortCameraGroup(pygame.sprite.Group):

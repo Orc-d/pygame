@@ -4,7 +4,7 @@ from support import *
 
 class Player(pygame.sprite.Sprite):
     #장애물 위치를 알기위해 obstacle_sprites 을 arg 로 받음
-    def __init__(self,pos,groups,obstacle_sprites):
+    def __init__(self,pos,groups,obstacle_sprites,create_attack):
         super().__init__(groups)
         self.image = pygame.image.load('graphics\\test\\player.png')
         self.rect = self.image.get_rect(topleft = pos)
@@ -29,6 +29,11 @@ class Player(pygame.sprite.Sprite):
         
         #장애물 sprite 객체 ( 충돌 처리용 )
         self.obstacle_sprites = obstacle_sprites
+        
+        #무기
+        self.create_attack = create_attack
+        self.weapon_index = 0
+        self.weapon = list(weapon_data.keys())[self.weapon_index]
         
     def import_player_assets(self):
         charactor_path = 'graphics\\player' 
@@ -75,7 +80,7 @@ class Player(pygame.sprite.Sprite):
             if keys[pygame.K_SPACE] and not self.attacking:
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
-                print('attack')
+                self.create_attack()
             #마법
             if keys[pygame.K_LCTRL] and not self.attacking:
                 self.attacking = True

@@ -4,7 +4,7 @@ from support import *
 
 class Player(pygame.sprite.Sprite):
     #장애물 위치를 알기위해 obstacle_sprites 을 arg 로 받음
-    def __init__(self,pos,groups,obstacle_sprites,create_attack):
+    def __init__(self,pos,groups,obstacle_sprites,create_attack,distroy_attack):
         super().__init__(groups)
         self.image = pygame.image.load('graphics\\test\\player.png')
         self.rect = self.image.get_rect(topleft = pos)
@@ -34,6 +34,10 @@ class Player(pygame.sprite.Sprite):
         self.create_attack = create_attack
         self.weapon_index = 0
         self.weapon = list(weapon_data.keys())[self.weapon_index]
+        self.distroy_attack = distroy_attack
+        self.can_switch_weapon = True
+        self.weapon_switch_time = None
+        self.switch_duration_cooldown = 200
         
     def import_player_assets(self):
         charactor_path = 'graphics\\player' 
@@ -86,6 +90,16 @@ class Player(pygame.sprite.Sprite):
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 print('magic')
+            
+            if keys[pygame.K_q] and self.can_switch_weapon:
+                self.can_switch_weapon = False
+                self.weapon_switch_time = pygame.time.get_ticks()
+                
+                if self.weapon_index < len(list(weapon_data.keys())) - 1:
+                    self.weapon_index += 1
+                else:
+                    self.weapon_index = 0
+                self.weapon = list(weapon_data.keys())[self.weapon_index]
         
     def get_status(self):
         
@@ -152,7 +166,12 @@ class Player(pygame.sprite.Sprite):
         
         if self.attacking:
             if current_time - self.attack_time >= self.attack_cooldown:
+                self.distroy_attack()
                 self.attacking = False
+        
+        if not self.can_switch_weapon:
+            if current_time - self.weapon_switch_time >= self.switch_duration_cooldown:
+                self.can_switch_weapon = True
         
     def animate(self):
         animation = self.animations[self.status]  

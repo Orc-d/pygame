@@ -17,6 +17,9 @@ class Level:
         
         self.obstacles_sprite = pygame.sprite.Group()
         
+        #attack 스프라이트
+        self.current_attack = None
+        
         self.create_map()
         
     def create_map(self):
@@ -53,10 +56,17 @@ class Level:
         #             self.player = Player((x,y),[self.visible_sprite],self.obstacles_sprite)
     
         #플레이어 공격 처리를 위해 create_attack 객체를 넘겨줌 play 내부에서 실행되게 하기 위해 () 없이 넘겨주기만함
-        self.player = Player((2000,1430),[self.visible_sprite],self.obstacles_sprite,self.create_attack)
+        self.player = Player((2000,1430),[self.visible_sprite],self.obstacles_sprite,self.create_attack,self.distroy_weapon)
     
     def create_attack(self):
-        Weapon(self.player,[self.visible_sprite])
+        self.current_attack = Weapon(self.player,[self.visible_sprite])
+        
+    def distroy_weapon(self):
+        if self.current_attack:
+            #sprite 객체 제거 kill
+            self.current_attack.kill()
+        self.current_attack = None
+            
     
     def run(self):
         self.visible_sprite.custom_draw(self.player)

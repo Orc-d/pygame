@@ -6,6 +6,7 @@ from debug import debug
 from support import *
 from random import randint
 from weapon import Weapon
+from ui import *
 
 class Level:
     def __init__(self):
@@ -21,6 +22,9 @@ class Level:
         self.current_attack = None
         
         self.create_map()
+        
+        #인터페이스
+        self.ui = UI()
         
     def create_map(self):
         layouts = {
@@ -72,7 +76,7 @@ class Level:
         self.visible_sprite.custom_draw(self.player)
         #플레이어 offset 값을 얻기 위해 player 객체를 받음
         self.visible_sprite.update()
-        debug(self.visible_sprite)
+        self.ui.display(self.player)
  
 #카메라 설정을 위해 Group 값을 상속 받고 커스텀        
 class YSortCameraGroup(pygame.sprite.Group):

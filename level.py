@@ -60,10 +60,21 @@ class Level:
         #             self.player = Player((x,y),[self.visible_sprite],self.obstacles_sprite)
     
         #플레이어 공격 처리를 위해 create_attack 객체를 넘겨줌 play 내부에서 실행되게 하기 위해 () 없이 넘겨주기만함
-        self.player = Player((2000,1430),[self.visible_sprite],self.obstacles_sprite,self.create_attack,self.distroy_weapon)
+        self.player = Player(
+            (2000,1430),
+            [self.visible_sprite],
+            self.obstacles_sprite,
+            self.create_attack,
+            self.distroy_weapon,
+            self.create_magic)
     
     def create_attack(self):
         self.current_attack = Weapon(self.player,[self.visible_sprite])
+        
+    def create_magic(self,style,strength,cost):
+        print(style)
+        print(strength)
+        print(cost)
         
     def distroy_weapon(self):
         if self.current_attack:

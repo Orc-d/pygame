@@ -17,6 +17,13 @@ class UI:
             path = weapon['graphic']
             weapon = pygame.image.load(path).convert_alpha()
             self.weapon_graphics.append(weapon)
+            
+        #magic 딕셔너리 전환
+        self.magic_graphics = []
+        for magic in magic_data.values():
+            path = magic['graphic']
+            magic = pygame.image.load(path).convert_alpha()
+            self.magic_graphics.append(magic)
     
     def show_bar(self,current,max_amount,bg_rect,color):
         
@@ -58,15 +65,23 @@ class UI:
         #bg_rect 함수를 리턴해 다른곳에서 사용가능하게함
     
     #무기 아이콘 선정 함수
-    def weapon_overlay(self,wepon_index,has_switched):
+    def weapon_overlay(self,weapon_index,has_switched):
         bg_rect = self.selection_box(10,630,has_switched) #무기
         #bg_rect 함수가 리턴되는 상황
-        weapon_surf = self.weapon_graphics[wepon_index]
+        weapon_surf = self.weapon_graphics[weapon_index]
         #bg_rect 리턴 받은 값을 통해 weapon 의 센터값을 설정함
         weapon_rect = weapon_surf.get_rect(center = bg_rect.center)
         
         self.display_surface.blit(weapon_surf,weapon_rect)
         
+    def magic_overlay(self,magic_index,has_switched):
+        bg_rect = self.selection_box(80,635,has_switched) #무기
+        #bg_rect 함수가 리턴되는 상황
+        magic_surf = self.magic_graphics[magic_index]
+        #bg_rect 리턴 받은 값을 통해 weapon 의 센터값을 설정함
+        magic_rect = magic_surf.get_rect(center = bg_rect.center)
+        
+        self.display_surface.blit(magic_surf,magic_rect)
 
         
 
@@ -77,4 +92,4 @@ class UI:
         
         self.show_exp(player.exp)
         self.weapon_overlay(player.weapon_index,not player.can_switch_weapon)
-        # self.selection_box(80,635) #마법
+        self.magic_overlay(player.magic_index,not player.can_switch_magic)

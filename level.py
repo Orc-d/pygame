@@ -7,6 +7,7 @@ from support import *
 from random import randint
 from weapon import Weapon
 from ui import *
+from enemy import Enemy
 
 class Level:
     def __init__(self):
@@ -30,7 +31,8 @@ class Level:
         layouts = {
             'boundary' : import_csv_layout('map\\map_FloorBlocks.csv'),
             'grass' : import_csv_layout('map\\map_Grass.csv'),
-            'object' : import_csv_layout('map\\map_Objects.csv')
+            'object' : import_csv_layout('map\\map_Objects.csv'),
+            'entities' : import_csv_layout('map\\map_Entities.csv')
         }
         graphics = {
             'grass' : import_folder('graphics\\grass'),
@@ -52,6 +54,23 @@ class Level:
                             surf = graphics['objects'][int(col)]
                             #엑셀 파일 안에 있는 string 숫자 값을 int 로 변환하여 리스트에 사용
                             Tile((x,y),[self.visible_sprite,self.obstacles_sprite],'object',surf)
+                        if style == 'entities':
+                            #394는 csv 파일 안의 플레이어 번호
+                            if col == '394':
+                                self.player = Player(
+                                    (x,y),
+                                    [self.visible_sprite],
+                                    self.obstacles_sprite,
+                                    self.create_attack,
+                                    self.distroy_weapon,
+                                    self.create_magic)
+                            else:
+                                if col == '390' : monster_name = 'bamboo'
+                                elif col == '391' : monster_name = 'spirit'
+                                elif col == '392' : monster_name = 'raccoon'
+                                else: monster_name = 'squid'
+                                
+                                Enemy(monster_name,(x,y),[self.visible_sprite],self.obstacles_sprite)
     
         #         if col == 'x':
         #             Tile((x,y),[self.visible_sprite,self.obstacles_sprite])
@@ -60,13 +79,6 @@ class Level:
         #             self.player = Player((x,y),[self.visible_sprite],self.obstacles_sprite)
     
         #플레이어 공격 처리를 위해 create_attack 객체를 넘겨줌 play 내부에서 실행되게 하기 위해 () 없이 넘겨주기만함
-        self.player = Player(
-            (2000,1430),
-            [self.visible_sprite],
-            self.obstacles_sprite,
-            self.create_attack,
-            self.distroy_weapon,
-            self.create_magic)
     
     def create_attack(self):
         self.current_attack = Weapon(self.player,[self.visible_sprite])
@@ -87,6 +99,7 @@ class Level:
         self.visible_sprite.custom_draw(self.player)
         #플레이어 offset 값을 얻기 위해 player 객체를 받음
         self.visible_sprite.update()
+        self.visible_sprite.enemy_update(self.player)
         self.ui.display(self.player)
  
 #카메라 설정을 위해 Group 값을 상속 받고 커스텀        
@@ -121,3 +134,8 @@ class YSortCameraGroup(pygame.sprite.Group):
             self.display_surface.blit(sprite.image,offset_pos)
             # 여기까지가 draw 메서드랑 비슷 ( 드로우 메서드는 arg로 값을 줘야하는데 우린 미리 줌)
             # 여기서 offset_pos 는 offset_rect 임
+        
+    def enemy_update(self,player):
+        enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'enemy']
+        for enemy in enemy_sprites:
+            enemy.enemy_update(player)

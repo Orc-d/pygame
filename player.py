@@ -155,7 +155,7 @@ class Player(Entity):
         current_time = pygame.time.get_ticks()
         
         if self.attacking:
-            if current_time - self.attack_time >= self.attack_cooldown:
+            if current_time - self.attack_time >= self.attack_cooldown + weapon_data[self.weapon]['cooldown']:
                 self.distroy_attack()
                 self.attacking = False
         
@@ -181,6 +181,10 @@ class Player(Entity):
         #rect center 값을 계속 재설정해줘서 플래이어 파일 크기가 달라짐에 따른 이질감 해소
         self.rect = self.image.get_rect(center = self.hitbox.center)
                               
+    def get_full_weapon_damage(self):
+        base_damage = self.stats['attack']
+        weapon_damage = weapon_data[self.weapon]['damage']
+        return base_damage + weapon_damage
         
     def update(self):
         self.input()

@@ -21,7 +21,9 @@ class Level:
         
         #attack 스프라이트
         self.current_attack = None
-        
+        self.attack_sprites = pygame.sprite.Group()
+        self.attackable_sprites = pygame.sprite.Group()
+       
         self.create_map()
         
         #인터페이스
@@ -49,7 +51,7 @@ class Level:
                         if style == 'boundary':
                             Tile((x,y),[self.obstacles_sprite],'invisible')
                         if style == 'grass':
-                            Tile((x,y),[self.visible_sprite,self.obstacles_sprite],'grass',graphics['grass'][randint(0,2)])
+                            Tile((x,y),[self.visible_sprite,self.obstacles_sprite,self.attackable_sprites],'grass',graphics['grass'][randint(0,2)])
                         if style == 'object':
                             surf = graphics['objects'][int(col)]
                             #엑셀 파일 안에 있는 string 숫자 값을 int 로 변환하여 리스트에 사용
@@ -70,7 +72,7 @@ class Level:
                                 elif col == '392' : monster_name = 'raccoon'
                                 else: monster_name = 'squid'
                                 
-                                Enemy(monster_name,(x,y),[self.visible_sprite],self.obstacles_sprite)
+                                Enemy(monster_name,(x,y),[self.visible_sprite,self.attackable_sprites],self.obstacles_sprite,self.damage_player)
     
         #         if col == 'x':
         #             Tile((x,y),[self.visible_sprite,self.obstacles_sprite])
@@ -81,7 +83,7 @@ class Level:
         #플레이어 공격 처리를 위해 create_attack 객체를 넘겨줌 play 내부에서 실행되게 하기 위해 () 없이 넘겨주기만함
     
     def create_attack(self):
-        self.current_attack = Weapon(self.player,[self.visible_sprite])
+        self.current_attack = Weapon(self.player,[self.visible_sprite,self.attack_sprites])
         
     def create_magic(self,style,strength,cost):
         print(style)
@@ -94,12 +96,31 @@ class Level:
             self.current_attack.kill()
         self.current_attack = None
             
+    def player_attack_logic(self):
+        if self.attack_sprites:
+            for attack_sprite in self.attack_sprites:
+                #spritecollide(스프라이트, 대상그룹, dokill=T or F) dokill = T 면 대상제거 .. 
+                collision_sprites = pygame.sprite.spritecollide(attack_sprite,self.attackable_sprites,dokill=False)
+                if collision_sprites:
+                    for target_sprite in collision_sprites:
+                        if target_sprite.sprite_type == 'grass':
+                            target_sprite.kill()
+                        else:
+                            target_sprite.get_damage(self.player,attack_sprite.sprite_type)
     
+    def damage_player(self,amount,attack_type):
+        #파티클 처리를 위해 레벨어서 처리 후 에너미 쪽에 넘겨서 에너미에서 실행함
+        if self.player.vulnerable:
+            self.player.health -= amount
+            self.player.vulnerable = False
+            self.player.hurt_time = pygame.time.get_ticks()
+                        
     def run(self):
         self.visible_sprite.custom_draw(self.player)
         #플레이어 offset 값을 얻기 위해 player 객체를 받음
         self.visible_sprite.update()
         self.visible_sprite.enemy_update(self.player)
+        self.player_attack_logic()
         self.ui.display(self.player)
  
 #카메라 설정을 위해 Group 값을 상속 받고 커스텀        

@@ -7,7 +7,7 @@ class Player(Entity):
     #장애물 위치를 알기위해 obstacle_sprites 을 arg 로 받음
     def __init__(self,pos,groups,obstacle_sprites,create_attack,distroy_attack,create_magic):
         super().__init__(groups)
-        self.image = pygame.image.load('graphics\\test\\player.png')
+        self.image = pygame.image.load('graphics\\test\\player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = pos)
         #히트박스 생성
         self.hitbox = self.rect.inflate(0,-26)
@@ -51,6 +51,11 @@ class Player(Entity):
         self.energy = self.stats['energy']
         self.exp = 123
         self.speed = self.stats['speed']
+        
+        #데미지 타이머
+        self.vulnerable = True
+        self.hurt_time = None
+        self.invulnerbility_duration = 500
         
     def import_player_assets(self):
         charactor_path = 'graphics\\player' 
@@ -155,7 +160,7 @@ class Player(Entity):
         current_time = pygame.time.get_ticks()
         
         if self.attacking:
-            if current_time - self.attack_time >= self.attack_cooldown:
+            if current_time - self.attack_time >= self.attack_cooldown + weapon_data[self.weapon]['cooldown']:
                 self.distroy_attack()
                 self.attacking = False
         
@@ -166,6 +171,10 @@ class Player(Entity):
         if not self.can_switch_magic:
             if current_time - self.magic_switch_time >= self.switch_duration_cooldown:
                 self.can_switch_magic = True
+                
+        if not self.vulnerable:
+            if current_time - self.hurt_time >= self.invulnerbility_duration:
+                self.vulnerable = True
 
         
     def animate(self):
@@ -180,7 +189,18 @@ class Player(Entity):
         self.image = animation[int(self.frame_index)]
         #rect center 값을 계속 재설정해줘서 플래이어 파일 크기가 달라짐에 따른 이질감 해소
         self.rect = self.image.get_rect(center = self.hitbox.center)
+        
+        #깜빡임
+        if not self.vulnerable:
+            alpha = self.wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
                               
+    def get_full_weapon_damage(self):
+        base_damage = self.stats['attack']
+        weapon_damage = weapon_data[self.weapon]['damage']
+        return base_damage + weapon_damage
         
     def update(self):
         self.input()

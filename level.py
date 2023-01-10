@@ -10,11 +10,13 @@ from ui import *
 from enemy import Enemy
 from particles import AnimationPlayer
 from magic import MagicPlayer
+from upgrade import Upgrade
 
 class Level:
     def __init__(self):
         
         self.display_surface = pygame.display.get_surface()
+        self.game_paused = False
         
         #카메라 설정을 한 그룹 ( 커스텀 메이드 )
         self.visible_sprite = YSortCameraGroup()
@@ -30,6 +32,7 @@ class Level:
         
         #인터페이스
         self.ui = UI()
+        self.upgrade = Upgrade(self.player)
         
         #파티클
         self.animation_player = AnimationPlayer()
@@ -78,7 +81,7 @@ class Level:
                                 elif col == '392' : monster_name = 'raccoon'
                                 else: monster_name = 'squid'
                                 
-                                Enemy(monster_name,(x,y),[self.visible_sprite,self.attackable_sprites],self.obstacles_sprite,self.damage_player,self.trigger_death_particles)
+                                Enemy(monster_name,(x,y),[self.visible_sprite,self.attackable_sprites],self.obstacles_sprite,self.damage_player,self.trigger_death_particles,self.add_exp)
     
         #         if col == 'x':
         #             Tile((x,y),[self.visible_sprite,self.obstacles_sprite])
@@ -132,14 +135,27 @@ class Level:
     
     def trigger_death_particles(self,pos,particles_type):
         self.animation_player.create_particles(particles_type,pos,[self.visible_sprite])
+    
+    def add_exp(self,amount):
+        self.player.exp += amount
+    
+    def toggle_menu(self):
+        self.game_paused = not self.game_paused
+        
                         
     def run(self):
         self.visible_sprite.custom_draw(self.player)
-        #플레이어 offset 값을 얻기 위해 player 객체를 받음
-        self.visible_sprite.update()
-        self.visible_sprite.enemy_update(self.player)
-        self.player_attack_logic()
         self.ui.display(self.player)
+        
+        
+        if self.game_paused:
+            self.upgrade.display()
+        else:
+            self.visible_sprite.update()
+            #플레이어 offset 값을 얻기 위해 player 객체를 받음
+            self.visible_sprite.enemy_update(self.player)
+            self.player_attack_logic()
+        
  
 #카메라 설정을 위해 Group 값을 상속 받고 커스텀        
 class YSortCameraGroup(pygame.sprite.Group):

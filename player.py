@@ -10,7 +10,7 @@ class Player(Entity):
         self.image = pygame.image.load('graphics\\test\\player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = pos)
         #히트박스 생성
-        self.hitbox = self.rect.inflate(0,-26)
+        self.hitbox = self.rect.inflate(-6,-26)
         
         #그래픽 설정 함수 생성시 실행
         self.import_player_assets()
@@ -59,6 +59,11 @@ class Player(Entity):
         self.hurt_time = None
         self.invulnerbility_duration = 500
         
+        #소리
+        self.weapon_attack_sound = pygame.mixer.Sound('audio\\sword.wav')
+        self.weapon_attack_sound.set_volume(0.4)
+        
+        
     def import_player_assets(self):
         charactor_path = 'graphics\\player' 
         self.animations = {'up': [],'down': [],'left': [],'right': [],
@@ -103,6 +108,8 @@ class Player(Entity):
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()
+                #소리 재생
+                self.weapon_attack_sound.play()
             #마법
             if keys[pygame.K_LCTRL] and not self.attacking:
                 self.attacking = True

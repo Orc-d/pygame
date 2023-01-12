@@ -12,6 +12,12 @@ class Game:
 		self.clock = pygame.time.Clock()
 
 		self.level = Level()
+  
+		#소리
+		main_sound = pygame.mixer.Sound('audio\\main.ogg')
+		main_sound.set_volume(0.5)
+		#loop 값을 -1로 줘서 무한 반복
+		main_sound.play(loops=-1)
 	
 	def run(self):
 		while True:
@@ -24,7 +30,7 @@ class Game:
 						self.level.toggle_menu()
      
 
-			self.screen.fill('black')
+			self.screen.fill(WATER_COLOR)
 			self.level.run()
 			pygame.display.update()
 			self.clock.tick(FPS)

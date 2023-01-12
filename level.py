@@ -38,6 +38,10 @@ class Level:
         self.animation_player = AnimationPlayer()
         self.magic_player = MagicPlayer(self.animation_player)
         
+        self.magic_attack_sound = {0:pygame.mixer.Sound('audio\\Fire.wav'),1:pygame.mixer.Sound('audio\\heal.wav')}
+        self.magic_attack_sound[0].set_volume(0.2)
+        self.magic_attack_sound[1].set_volume(0.2)
+        
     def create_map(self):
         layouts = {
             'boundary' : import_csv_layout('map\\map_FloorBlocks.csv'),
@@ -97,10 +101,10 @@ class Level:
     def create_magic(self,style,strength,cost):
         if style == 'heal':
             self.magic_player.heal(self.player,strength,cost,[self.visible_sprite])
-            
+            self.magic_attack_sound[1].play()
         if style == 'flame':
             self.magic_player.flame(self.player,cost,[self.visible_sprite,self.attack_sprites])
-        
+            self.magic_attack_sound[0].play()        
 
         
     def distroy_weapon(self):
